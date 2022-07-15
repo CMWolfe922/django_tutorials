@@ -8,7 +8,7 @@ from tinymce.models import HTMLField
 class ArticleSeries(models.Model):
     title = models.CharField(max_length=150)
     subtitle = models.CharField(max_length=255, default="", blank=True)
-    series_slug = models.SlugField('Series slug', null=False, blank=False, unique=True)
+    slug = models.SlugField('Series slug', null=False, blank=False, unique=True)
     publish_date = models.DateTimeField("Date Published", default=timezone.now)
 
     def __str__(self):
@@ -36,7 +36,7 @@ class Article(models.Model):
     # I need to create a method that creates a slug field and use property decorator
     @property
     def slug(self):
-        return self.article_slug
+        return self.series.slug + '/' + self.article_slug
 
     class Meta:
         verbose_name_plural = "Article"

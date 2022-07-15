@@ -55,3 +55,64 @@ def series(request, series: str):
     return render(request, 'main/home.html', context={'objects': series_articles})
 
 ```
+7. Now Comes the part where I create the `article.html` file:
+
+```html
+{% extends 'main/base.html' %}
+{% block content %}
+<div class="row media content-section mobiledevice">
+    <div class="col-lg-12 col-md-12 col-sm-12 mt-3 mb-2">
+        <div class="d-flex">
+            <div>
+                <h1 class="title-style">{{ object.title }}</h1>
+                <h2 class="subtitle-style">{{ object.subtitle }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-9 col-md-12 col-sm-12 mt-3 mb-2" id="content">
+        <div class="article-style">
+            <!-- safe means we want to render HTML code instead of text -->
+            {{ object.content|safe }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+```
+
+8. Now that we have a template to render our articles in, I need to add the article file to the `urlpatterns` in `urls.py`
+
+```python
+urlpatterns = [
+     # 2) Django then looks here and sees to look for views.homepage view
+    path('', views.homepage, name='homepage'),
+    # now create a new url patter with a path to the series
+    path('<series>', views.series, name='series'),
+    # Add the path for rendering the articles: This means I have to create a articles view
+    path('<series>/<article>', views.article, name='article'),
+]
+```
+
+9. From here I will create a new view for `articles.html`: First I need to go to the `models.py` file where I created the `slug` method with a `@property` decorator and join `series_slug` with `article_slug`
+
+###### main/models.py
+```python
+...
+
+    # I need to create a method that creates a slug field and use property decorator
+    @property
+    def slug(self):
+        return self.series.series_slug + '/' + self.article_slug
+
+```
+
+- Then whats left is the article view:
+
+```python
+# First I need to go to the models.py file where I created the slug method
+# with a @property decorator and join series_slug with article_slug
+
+def article(request, series: str, article: str):
+    matching_article = Article.objects.filter(series__series_slug=series, article_slug=article).first() # instead of all get first instance
+    return render(request, 'main/article.html', context={'object': matching_article})
+```

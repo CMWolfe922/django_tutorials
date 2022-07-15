@@ -22,4 +22,6 @@ urlpatterns = [
     path('', views.homepage, name='homepage'),
     # now create a new url patter with a path to the series
     path('<series>', views.series, name='series'),
+    # Add the path for rendering the articles: This means I have to create a articles view
+    path('<series>/<article>', views.article, name='article'),
 ]

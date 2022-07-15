@@ -9,8 +9,9 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-9 col-md-12 col-sm-12 mt-3 mb-2">
+    <div class="col-lg-9 col-md-12 col-sm-12 mt-3 mb-2" id="content">
         <div class="article-style">
+            <!-- safe means we want to render HTML code instead of text -->
             {{ object.content|safe }}
         </div>
     </div>

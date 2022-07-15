@@ -13,5 +13,22 @@ def homepage(request):
 
 
 def series(request, series: str):
-    series_articles = Article.objects.filter(series__series_slug=series).all()
-    return render(request, 'main/home.html', context={'objects': series_articles})
+    matching_series = Article.objects.filter(series__slug=series).all()
+
+    return render(
+        request=request,
+        template_name='main/home.html',
+        context={'objects': matching_series}
+        )
+
+# First I need to go to the models.py file where I created the slug method
+# with a @property decorator and join series_slug with article_slug
+
+def article(request, series: str, article: str):
+    matching_article = Article.objects.filter(series__slug=series, article_slug=article).first()
+
+    return render(
+        request=request,
+        template_name='main/article.html',
+        context={'object': matching_article}
+        )
