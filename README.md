@@ -215,3 +215,10 @@ def register(request):
     return render(request, 'registeration.html', {'form': form})
 
 ```
+
+
+===
+
+## I LEFT OFF AT 18:01 on Tutorial 7
+
+https://www.youtube.com/watch?v=lHYzmlx2Vso
