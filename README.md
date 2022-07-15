@@ -15,3 +15,34 @@ Django tutorial course just to cover the basics and to have something to referen
 2. Install `fontawesomefree` then add it to the settings file in the `INSTALLED_APPS` section `fontawesomefree`
 
 3. Inside of the `static/main` directory, create a `main.css` file where all of the websites main styling will be handled.
+
+4. Created the home.html file:
+
+```html
+{% extends 'main/base.html' %}
+{% block content %}
+<div class="row display-flex justify-content-center">
+    {% for object in objects %}
+    <div class="col-lg-4 col-md-6 col-sm-12 mobiledevices">
+        <article class="media content-section customhover" style="height: 95%;">
+            <div class="media-body">
+                <a href="/{{object.slug}}">
+                    <img class="img-fluid" src="/" alt="">
+                </a>
+                <div>
+                    <a class="article-title line-clamp-2 title-style" style="font-size:22px" href="/{{object.slug}}">
+                        {{ object.title }}
+                    </a>
+                    <a href="/{{object.slug}}" style="text-decoration: none;">
+                        <p class="article-content line-clamp-5 subtitle-style">{{ object.subtitle }}</p>
+                    </a>
+                </div>
+            </div>
+        </article>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
+```
+5. Now in order to get this template to work. I have to create a view in the `main` apps `views.py` file. Since I already have a homepage view created I just have to import the model `ArticleSeries` and then create a variable inside the `homepage` `view` `function` called `matching_series` and then return `render(request, 'template.html', context={'objects': matching_series})`
