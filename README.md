@@ -116,3 +116,102 @@ def article(request, series: str, article: str):
     matching_article = Article.objects.filter(series__series_slug=series, article_slug=article).first() # instead of all get first instance
     return render(request, 'main/article.html', context={'object': matching_article})
 ```
+
+
+---
+
+
+
+
+# TUTORIAL-7: Creating User Registration
+---
+
+
+1. Build an html file called `registration.html` in the `template` directory of the `users` app directory
+
+```html
+<!-- First I want to extend the base.html file from main app -->
+{% extends 'main/base.html' %}
+{% block content %}
+<div>
+    <form method="POST">
+        <!-- when creating a form dont forget the csrf_token -->
+        {% csrf_token %}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Join Today</legend>
+        </fieldset>
+
+        By registering, you accept the Terms of Service and Privacy Notice
+
+        <div class="form-group">
+            <button class="btn btn-outline-info" type="submit">Sign Up</button>
+        </div>
+    </form>
+    <div class="border-top pt-3">
+        <small class="text-muted">
+            Already have an account? <a class="ml-2" href="/login">Sign In</a>
+        </small>
+    </div>
+</div>
+{% endblock %}
+
+```
+
+2. Next I will have to create a form to create new user accounts:
+
+```python
+from django.forms import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import get_user_model
+
+
+
+class UserRegistrationForm(UserCreationForm):
+    email = forms.EmailField(help_text="A valid email address required")
+
+    class Meta:
+        model = get_user_model()
+        fields = ['first_name', 'last_name', 'username', 'email', 'password1', 'password2']
+
+    def save(self, commit=True):
+        user = super(UserRegistrationForm, self).save(commit=False)
+        user.email = self.cleaned_data['email']
+        if commit:
+            user.save()
+
+        return user
+
+```
+
+3. Now that the form is ready, I will have to create the view in views.py
+
+```python
+from django.shortcuts import render, redirect
+from django.contrib.auth import get_user_model, login
+from .forms import UserRegistrationForm
+
+
+# Create your views here.
+def register(request):
+
+    if request.user.is_authenticated:
+        return redirect('/')
+
+    if request.method == 'POST':
+        # check if form is valid
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('/')
+
+        else:
+            for error in list(form.errors.values()):
+                print(request, error)
+
+    else:
+        form = UserRegistrationForm()
+
+    return render(request, 'registeration.html', {'form': form})
+
+```

@@ -21,6 +21,7 @@ from django.urls import path, include
 urlpatterns = [
     # 1) Django looks here for a url to render. This points to main app
     path('', include('main.urls')),
+    path('', include('users.urls')),
     path('admin/', admin.site.urls),
     path('tinymce/', include('tinymce.urls')),
 ]
