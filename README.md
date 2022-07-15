@@ -46,3 +46,12 @@ Django tutorial course just to cover the basics and to have something to referen
 {% endblock %}
 ```
 5. Now in order to get this template to work. I have to create a view in the `main` apps `views.py` file. Since I already have a homepage view created I just have to import the model `ArticleSeries` and then create a variable inside the `homepage` `view` `function` called `matching_series` and then return `render(request, 'template.html', context={'objects': matching_series})`
+
+6. Now I need to create a series view: To do this I will have to use the filter option to filter all the slugs in a series:
+
+```python
+def series(request, series: str):
+    series_articles = Article.objects.filter(series__series_slug=series).all()
+    return render(request, 'main/home.html', context={'objects': series_articles})
+
+```

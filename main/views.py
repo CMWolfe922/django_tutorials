@@ -10,3 +10,8 @@ def homepage(request):
     # Since the home.html references objects, I need to make sure that the context is equal to objects
     matching_series = ArticleSeries.objects.all()
     return render(request, 'main/home.html', context={'objects': matching_series})
+
+
+def series(request, series: str):
+    series_articles = Article.objects.filter(series__series_slug=series).all()
+    return render(request, 'main/home.html', context={'objects': series_articles})
