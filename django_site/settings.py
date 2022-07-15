@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 
     # INSTALLED DJANGO APPS:
     'tinymce',
+    'fontawesomefree',
 
 ]
 
