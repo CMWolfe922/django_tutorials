@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-
+from django.urls import reverse, reverse_lazy
 from .models import Article, ArticleSeries
 # Create your views here.
 
@@ -32,3 +32,4 @@ def article(request, series: str, article: str):
         template_name='main/article.html',
         context={'object': matching_article}
         )
+
