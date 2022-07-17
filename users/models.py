@@ -10,13 +10,13 @@ class CustomUser(AbstractUser):
         ('regular', 'regular'),
         ('subscriber', 'subscriber'),
         ('moderator', 'moderator'),
+        ('staff', 'staff'),
+        ('administrator', 'administrator'),
     )
 
-    # create an email field
     email = models.EmailField(unique=True)
-    # this field will create a drop down list for describing the type of user
     status = models.CharField(max_length=100, choices=STATUS, default='regular')
-    description = models.TextField('Description', max_length=500, default='', blank=True)
+    description = models.TextField("Description", max_length=600, default='', blank=True)
 
     def __str__(self):
         return self.username

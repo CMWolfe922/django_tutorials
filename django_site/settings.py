@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     # INSTALLED DJANGO APPS:
     'tinymce',
     'fontawesomefree',
+    'crispy_forms',
+    # 'crispy_bootstrap5',
 
 ]
 
@@ -141,8 +143,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = BASE_DIR / 'media/'
 MEDIA_URL = 'media/'
 
-CRISPY_TEMPLATE = 'bootstrap4'
-
 # This must be added in order for the custom user model to work properly. Also,
 # if you have already ran migrations, you have to delete all the existing migrations
 # as well as the database. Thats why this should be done first before anything else
@@ -171,5 +171,9 @@ TINYMCE_DEFAULT_CONFIG = {
 }
 TINYMCE_SPELLCHECKER = True
 
+
+# CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 # ============================================================================ #

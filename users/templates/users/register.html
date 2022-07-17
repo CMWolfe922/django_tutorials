@@ -1,12 +1,15 @@
-<!-- First I want to extend the base.html file from main app -->
-{% extends 'main/base.html' %}
+ {% extends "main/base.html" %}
+<!-- Load crispy forms into template -->
+{% load crispy_forms_tags %}
+<!-- Create block content -->
 {% block content %}
-<div>
+<div class="content-section">
+    <h1>User Registration: </h1>
     <form method="POST">
-        <!-- when creating a form dont forget the csrf_token -->
         {% csrf_token %}
         <fieldset class="form-group">
             <legend class="border-bottom mb-4">Join Today</legend>
+            {{ form|crispy }}
         </fieldset>
 
         By registering, you accept the Terms of Service and Privacy Notice
@@ -17,8 +20,8 @@
     </form>
     <div class="border-top pt-3">
         <small class="text-muted">
-            Already have an account? <a class="ml-2" href="/login">Sign In</a>
-        </small>
+                Already Have An Account? <a class="ml-2" href="/login">Sign In</a>
+            </small>
     </div>
 </div>
-{% endblock %}
+{% endblock content %}
