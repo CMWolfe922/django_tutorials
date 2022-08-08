@@ -490,3 +490,41 @@ To startout I will focus on the `navbar.html` because here I can change which ic
 
 > Now lets take the navbar and then begin to implement this. first, I must create a new branch for tutorial 9: This will be the Login and Logout tutorial. I will also learn about verifiying user access and whether the user is logged in and has access to the data they request:
 
+Now I need to copy and paste the `navbar.html` file into this README file so that I can make the required changes:
+
+```html
+<header class="site-header" style="margin-bottom: 5px;">
+    <nav class="navbar navbar-expand-md navbar-color">
+        <div class="container">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link" href="/">Home</a>
+            </div>
+            <button aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler ml-auto float-right btncolor" data-target="#navbarToggle" data-toggle="collapse" type="text">
+                <i class="fas fa-bars fa-2x"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarToggle">
+                <!-- navbar left side -->
+                <div class="navbar-nav mr-auto">
+                    <a class="nav-item nav-link" href="/">About</a>
+                </div>
+                <!-- navbar Right Side -->
+                <!-- Where the user verification starts -->
+                <div class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <a class="nav-item nav-link" href="{% url 'logout' %}">
+                            Log Out <i class="fas fa-sign-out-alt"></i>
+                        </a>
+                    {% else %}
+                        <a class="nav-item nav-link" href="{% url 'login' %}">
+                            Login <i class="fas fa-sign-in-alt"></i>
+                        </a>
+                        <a class="nav-item nav-link" href="{% url 'register' %}">
+                            Sign Up <i class="fas fa-user-plus"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+```
