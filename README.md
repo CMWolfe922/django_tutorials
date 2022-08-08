@@ -224,6 +224,115 @@ def register(request):
 
 ===
 
-## I LEFT OFF AT 18:01 on Tutorial 7
+---
 
-https://www.youtube.com/watch?v=lHYzmlx2Vso
+# TUTORIAL 8: Messaging
+---
+
+
+> In the `users` app move the `register.html` to another folder in the `templates` directory to the `users` directory inside `templates` directory.
+
+- Then go to `views.py` in the `users` app and at the end of the register function change the template_name to include:
+    - `template_name = 'users/register.html'`
+
+
+---
+
+#### NOW LETS MOVE TO THE DJANGO MESSAGING TUTORIAL:
+
+We can display messages to users using the django messaging framework. I can also control how they are displayed and who sees them. 
+
+One use case would be to notify the user (after they register) that they have successfully registered, or that they need to fix something to register. This can also be used for any task in the app that requires the user to submit a form or perform a task. 
+    - adding contacts
+    - messaging someone else - success message
+    - logging in and out - message confirming either
+    - receiving a message - popout notifictation
+    - receiveing a like or sometype of request from another user
+
+
+> So to start I will go to the `views.py` file in the `users` app and then begin adding messages their:
+
+- So to do this I will have to import the messages packages `from django.contrib import messages` . Then after the `login(request, user)` line, I will add the messages function/method to create a message upon successfully logging in: 
+
+```python
+from django.shortcuts import render, redirect
+from django.contrib.auth import get_user_model, login
+# ===== NEW IMPORT TO THIS FILE ====== #
+from django.contrib import messages
+# ==================================== #
+from django.contrib.auth.decorators import wraps, resolve_url
+from .forms import UserRegistrationForm
+
+
+# Create your views here.
+def register(request):
+    # Check if the user is logged in already or not:
+    if request.user.is_authenticated:
+        # if user is already logged in, send them to homepage
+        return redirect('/')
+    # Check if the request method equals POST
+    if request.method == "POST":
+        # create a form variable and feed it the request.POST submission
+        form = UserRegistrationForm(request.POST)
+        # then check if form is valid
+        if form.is_valid():
+            # if form is valid save it and then login to the account and get redirected to homepage
+            user = form.save()
+            login(request, user)
+            messages.success(request, f"New account created: {user.username}")
+            return redirect('/')
+
+        else:
+            for error in list(form.errors.values()):
+                messages.error(request, error)
+
+    else:
+        form = UserRegistrationForm()
+
+    return render(
+        request=request,
+        template_name = "users/register.html",
+        context={"form": form}
+        )
+```
+
+- The best place to create a template to handle a message template is after our navbar since every file will have the navbar.
+
+So inside the `main` app, go to the `templates/includes/` directory and add a `messaging.html` file. This will be the same directory that has the `navbar.html` file inside of it. 
+
+> This is the `messaging.html` template
+
+- `messaging.html`
+```html
+
+<!-- CREATE MAIN IF STATEMENT TO DETERMINE WHICH MESSAGE IS DISPLAYED -->
+{% if messages %}
+    <!-- NOW ITERATE THROUGH THE MESSAGES -->
+    {% for message in messages %}
+        <!-- This is where the message type checks begin starting with 'success messages' -->
+        {% if message.tags == 'success' %}
+        <div class="alert alert-success alert-dismissible" role="alert">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            {{ message|safe|escape }}
+        </div>
+        {% elif message.tags == 'error' %}
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            {{ message|safe }}
+        </div>
+        {% elif message.tags == 'info' %}
+        <div class="alert alert-info alert-dismissible" role="alert">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            {{ message|safe|escape }}
+        </div>
+        {% elif message.tags == 'warning' %}
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            {{ message|safe|escape }}
+        </div>
+        {% endif %}
+        <!-- End the first if and the only for statement -->
+    {% endfor %}
+    <!-- Final endif statement -->
+{% endif %}
+```
