@@ -12,13 +12,21 @@
                 <div class="navbar-nav mr-auto">
                     <a class="nav-item nav-link" href="/">About</a>
                 </div>
+                <!-- navbar Right Side -->
+                <!-- Where the user verification starts -->
                 <div class="navbar-nav">
-                    <a class="nav-item nav-link" href="/">
-                        Login <i class="fas fa-sign-in-alt"></i>
-                    </a>
-                    <a class="nav-item nav-link" href="register/">
-                        Sign Up <i class="fas fa-user-plus"></i>
-                    </a>
+                    {% if user.is_authenticated %}
+                        <a class="nav-item nav-link" href="{% url 'logout' %}">
+                            Log Out <i class="fas fa-sign-out-alt"></i>
+                        </a>
+                    {% else %}
+                        <a class="nav-item nav-link" href="{% url 'login' %}">
+                            Login <i class="fas fa-sign-in-alt"></i>
+                        </a>
+                        <a class="nav-item nav-link" href="{% url 'register' %}">
+                            Sign Up <i class="fas fa-user-plus"></i>
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         </div>

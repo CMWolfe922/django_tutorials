@@ -528,3 +528,73 @@ Now I need to copy and paste the `navbar.html` file into this README file so tha
     </nav>
 </header>
 ```
+
+> When the above template was created in the README file, there was no such thing as the login or logout templates. So it would've created an error. Therefore, before adding this to the project file. I can now go and create the required templates. ALSO, I need to create the `urlpatterns`. On this topic, I will show what to do below:
+
+`users/urls.py`
+```python
+from django.urls import path
+from . import views
+# ============================================================================================ #
+# THIS WAS IMPORTED FOR THE BELOW URLPATTERNS
+from django.contrib.auth import views as auth_views
+
+
+urlpatterns = [
+    path("register/", views.register, name="register"),
+    # ============================================================================================ #
+    # THESE ARE THE ADDED URLS: 
+    # ============================================================================================ #
+    # Now create my new login and logout paths:
+    path('login', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'),
+    path('logout', auth_views.LogoutView.as_view(template_name='users/logout.html'), name='logout'),
+]
+```
+
+- First I created the `login.html` file so that users can freely login and logout:
+###### `login.html`
+```html 
+{% extends "main/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div>
+    <form method="POST">
+        {% csrf_token %}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Log In</legend>
+            {{ form|crispy }}
+        </fieldset>
+        <div class="form-group">
+            <button class="btn btn-outline-info" type="submit">Login</button>
+        </div>
+    </form>
+    <div class="border-top pt-3">
+        <small class="text-muted">
+            Need An Account? <a class="ml-2" href="{% url 'register' %}">Sign Up Now</a>
+        </small><br>
+        <small class="text-muted">
+            <a href="/">Forgot Password?</a>
+        </small>
+    </div>
+</div>
+{% endblock %}
+```
+
+- The next file created was the logout file. 
+###### `logout.html`
+```html
+{% extends "main/base.html" %}
+{% block content %}
+<div class="justify-content-center">
+    <h2> You have been successfully logged out! </h2>
+    <div class="border-top pt-3" style="min-height:65vh;">
+        <small class="text-muted">
+            <a href="{% url 'login' %}">Log In Again</a>
+        </small>
+    </div>
+</div>
+{% endblock %}
+```
+
+> Now that I have the basic files created I can update the navbar.html file to include the logic and user authentication to determine what to show: 
+
