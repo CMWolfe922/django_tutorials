@@ -461,8 +461,31 @@ This is the new setup for the `base.html` file:
 </html>
 ```
 
+- Now if I fillout the registration form with wrong information, I should receive a message stating what I did wrong...
+
+- The messages worked. They were displayed at the top letting me know when an error or some other information occured. 
 
 
+===
 
 
+# TUTORIAL 9: Login and Logout:
+---
 
+
+To startout I will focus on the `navbar.html` because here I can change which icons show up regarding the login or logout icons. I can run an if statement check to see if the user is logged in or not. To do this I will use the classic `{% if user.is_authenticated %}`
+
+- A simple way to get started adding this into a file is by going close to where you want to implement this inside the file and just create the if, else and endif django tags so that you can easily insert the proper code where it goes: 
+
+```html
+...
+
+{% if user.is_authenticated %}
+{% else %}
+{% endif %}
+
+...
+
+```
+
+> Now lets take the navbar and then begin to implement this. first, I must create a new branch 
