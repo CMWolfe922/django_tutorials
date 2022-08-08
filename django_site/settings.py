@@ -143,6 +143,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = BASE_DIR / 'media/'
 MEDIA_URL = 'media/'
 
+# CREATE THE REDIRECT URL
+LOGIN_REDIRECT_URL = '/'
+
 # This must be added in order for the custom user model to work properly. Also,
 # if you have already ran migrations, you have to delete all the existing migrations
 # as well as the database. Thats why this should be done first before anything else

@@ -1,4 +1,4 @@
- {% extends "main/base.html" %}
+{% extends "main/base.html" %}
 <!-- Load crispy forms into template -->
 {% load crispy_forms_tags %}
 <!-- Create block content -->
@@ -10,7 +10,7 @@
             {% csrf_token %}
             <fieldset class="form-group">
                 <legend class="border-bottom mb-4">Join Today</legend>
-                {{ form | crispy }}
+                {{ form|crispy }}
             </fieldset>
 
             By registering, you accept the Terms of Service and Privacy Notice
@@ -23,7 +23,7 @@
     <div class="border-top pt-3">
         <small class="text-muted">
                 Already Have An Account? <a class="ml-2" href="/login">Sign In</a>
-            </small>
+        </small>
     </div>
 </div>
 {% endblock content %}
