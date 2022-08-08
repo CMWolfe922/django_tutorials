@@ -336,3 +336,133 @@ So inside the `main` app, go to the `templates/includes/` directory and add a `m
     <!-- Final endif statement -->
 {% endif %}
 ```
+
+### Now that the messaging template is created: 
+---
+
+> I have to go the `base.html` file and then add the `messaging.html` template to an include statement after the row and column sections:
+
+`base.html` setup from before: 
+
+```html
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    {% block head %}
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap4.6 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css"
+        integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+
+    <!-- Add Bootstrap icons CDN Under here -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css">
+
+    <!-- Add FontAwesome CDN -->
+    <script src="https://kit.fontawesome.com/216d1cce07.js" crossorigin="anonymous"></script>
+
+    <!-- Add Custom CSS file -->
+    <link rel="stylesheet" type="text/css" href="{% static 'main/main.css' %}">
+
+    <!-- Jquery JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    {% endblock %}
+    <title>{% block title %}App Title: Base{% endblock %}</title>
+</head>
+
+<body>
+
+    {% include 'main/includes/navbar.html' %}
+    <div class="container-fluid">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+
+
+    <!-- jQuery and Bootstrap Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF"
+        crossorigin="anonymous"></script>
+
+    <!-- Optional JavaScript: This points to the custom.js file in main apps static/main directory -->
+    <script type="text/javascript" src="https://{% static 'main/custom.js' %}"></script>
+</body>
+
+</html>
+
+```
+
+This is the new setup for the `base.html` file:
+
+```html
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    {% block head %}
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap4.6 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css"
+        integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+
+    <!-- Add Bootstrap icons CDN Under here -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css">
+
+    <!-- Add FontAwesome CDN -->
+    <script src="https://kit.fontawesome.com/216d1cce07.js" crossorigin="anonymous"></script>
+
+    <!-- Add Custom CSS file -->
+    <link rel="stylesheet" type="text/css" href="{% static 'main/main.css' %}">
+
+    <!-- Jquery JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    {% endblock %}
+    <title>{% block title %}App Title: Base{% endblock %}</title>
+</head>
+
+<body>
+    {% include 'main/includes/navbar.html' %}
+    <main role="main" class="container-xl">
+        <div class="row">
+            <div class="col-lg-12 col-md-12-p-0 col-sm-12">
+                {% include 'main/includes/messaging.html' %}
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+    </main>
+
+    <!-- jQuery and Bootstrap Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF"
+        crossorigin="anonymous"></script>
+
+    <!-- Optional JavaScript: This points to the custom.js file in main apps static/main directory -->
+    <script type="text/javascript" src="https://{% static 'main/custom.js' %}"></script>
+</body>
+
+</html>
+```
+
+
+
+
+
+
