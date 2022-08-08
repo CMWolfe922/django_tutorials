@@ -488,4 +488,5 @@ To startout I will focus on the `navbar.html` because here I can change which ic
 
 ```
 
-> Now lets take the navbar and then begin to implement this. first, I must create a new branch 
+> Now lets take the navbar and then begin to implement this. first, I must create a new branch for tutorial 9: This will be the Login and Logout tutorial. I will also learn about verifiying user access and whether the user is logged in and has access to the data they request:
+
