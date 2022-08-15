@@ -734,3 +734,62 @@ def custom_login(request):
         context={"form": form},
     )
 ```
+
+
+#### Tutorial 10: Email Login Form
+
+> Now I will create a custom email login form. This will basically be a custom authentication system by creating some work around hacks. 
+
+So in the `users/forms.py` file I will create a new form object that I will add to the registration and login process. 
+
+`users/forms.py`
+```python 
+from django import forms
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm # <---- ADDED THE AuthenticationForm import as well
+from django.contrib.auth import get_user_model
+
+
+class UserRegistrationForm(UserCreationForm):
+    email = forms.EmailField(help_text='A valid email address, please.', required=True)
+
+    class Meta:
+        model = get_user_model()
+        fields = ['first_name', 'last_name', 'username', 'email', 'password1', 'password2']
+
+    def save(self, commit=True):
+        user = super(UserRegistrationForm, self).save(commit=False)
+        user.email = self.cleaned_data['email']
+        if commit:
+            user.save()
+
+        return user
+
+# ======================================================================================== #
+# ADDED THIS NEW USER LOGIN FORM OBJECT
+# ======================================================================================== #
+class UserLoginForm(AuthenticationForm):
+
+    def __init__(self,*args, **kwargs):
+        super(UserLoginForm, self).__init__(*args, **kwargs)
+
+    username = forms.CharField(
+        widget=forms.TextInput(
+            attrs={'class': 'form-control', 'placeholder': 'Username of Email'}),
+            label="Username or Email")
+
+    password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={'class': 'form-control', 'placeholder': 'Password'}))
+```
+
+In order to use the new `UserLoginForm`, I will have to import this to the `users/view.py` file and then replace the `AuthenticationForm` objects with the new `UserLoginForm` object
+
+Now that we have the `UserLoginForm` created and working, I need to now create an authentication for the backend. This way the login process and emails can be authenticated properly using a custom authentication process. 
+
+To start off, create a new script file in the `users` app called `backends.py`
+
+`users/backends.py`
+```python
+
+
+```

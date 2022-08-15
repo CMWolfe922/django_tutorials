@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model, login, logout, authenticate
 from django.contrib import messages
-from .forms import UserRegistrationForm
+from .forms import UserRegistrationForm, UserLoginForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 
@@ -45,7 +45,7 @@ def custom_logout(request):
 def custom_login(request):
 
     if request.method == "POST":
-        form = AuthenticationForm(request=request, data=request.POST)
+        form = UserLoginForm(request=request, data=request.POST)
         if form.is_valid():
             user = authenticate(
                 username=form.cleaned_data["username"],
@@ -60,7 +60,7 @@ def custom_login(request):
             for error in list(form.errors.values()):
                 messages.error(request, error)
 
-    form = AuthenticationForm()
+    form = UserLoginForm()
 
     return render(
         request=request,
