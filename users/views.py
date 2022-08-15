@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout, authenticate, get_user_model
 from django.contrib import messages
-from .forms import UserRegistrationForm, UserLoginForm
+from .forms import UserRegistrationForm, UserLoginForm, UserUpdateForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 
@@ -71,3 +71,22 @@ def custom_login(request):
         template_name="users/login.html",
         context={"form": form},
     )
+
+
+def profile(request, username):
+
+    if request.method == 'POST':
+        pass
+
+    user = get_user_model().objects.filter(username=username).first()
+
+    if user:
+        form = UserUpdateForm(instance=user)
+
+        return render(
+            request=request,
+            template_name="users/profile.html",
+            context={"form": form},
+            )
+
+    return redirect('homepage')
