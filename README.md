@@ -885,4 +885,97 @@ RECAPTCHA_PRIVATE_KEY = '6Lc09nchAAAAAF9qc3Rx0sXOgrbni9eU4XEHNRFr'
 SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']
 ```
 
-Now, I need to change the message that is displayed if the user fails to use the captcha checkbox when signing in. I can use my debug script to see where and how to change the message that is displayed by default with the reCAPTCHA 
+Now, I need to change the message that is displayed if the user fails to use the captcha checkbox when signing in. I can use my debug script to see where and how to change the message that is displayed by default with the reCAPTCHA.
+
+To change the message, you have to change the message in the `users/views.py` file. Where the login view function is, there is a spot that handles error messages. This is where the changes will be made.
+
+`users/views.py`
+```python
+
+@user_not_authenticated 
+def custom_login(request):
+
+    if request.method == "POST":
+        form = UserLoginForm(request=request, data=request.POST)
+        if form.is_valid():
+            user = authenticate(
+                username=form.cleaned_data["username"],
+                password=form.cleaned_data["password"],
+            )
+            if user is not None:
+                login(request, user)
+                messages.success(request, f"Hello <b>{user.username}</b>! You have been logged in!")
+                return redirect("homepage")
+        
+        else:
+            # ================================================================================================ #
+            # THIS IS THE NEW ELSE CLAUSE FOR HANDLING ERROR MESSAGES
+            # ================================================================================================ #
+            for key, error in list(form.errors.items()):
+                if key == 'captcha' and error[0] == 'This field is required.':
+                    messages.error(request, "You must pass the reCAPTCHA test!")
+                    continue
+                messages.error(request, error)
+            # ================================================================================================ #
+            # OLD VERSION:
+            # ================================================================================================ #
+            # for error in list(form.errors.values()):
+            #     messages.error(request, error)
+
+            # ================================================================================================ #
+
+    form = UserLoginForm()
+
+    return render(
+        request=request,
+        template_name="users/login.html",
+        context={"form": form},
+    )
+```
+
+There are other customizeable features regarding reCAPTCHA and the version of security you want. For more information just checkout the docs on the [django-recaptcha github page](https://github.com/torchbox/django-recaptcha) 
+---
+
+
+# TUTORIAL 12: User Profiles
+---
+
+This tutorial will show how to create user profiles. I will create the urlpattern based on the username and the view and form will be created inside the `users` app. 
+
+To get started I will go to the `users/url.py` file and add a new pattern:
+
+`users/url.py`
+```python
+...
+
+urlpatterns = [
+    path("register/", views.register, name="register"),
+    path('login/', views.custom_login, name="login"),
+    path('logout/', views.custom_logout, name="logout"),
+    # ========================================================= #
+    # THE NEW URL PATTERN FOR PROFILES
+    # ========================================================= #
+    path('profile/<username>/', views.profile, name="profile"),
+]
+```
+
+- Next thing I will need to do is go to the `users/forms.py` file and begin creating the new profile form to allow users to create new profiles and update them. I will create a form called `UserUpdateForm` since it will basically be updating the custom user signup form. 
+
+I will basically just be using the `CustomUser` model that I have already created to get the name, surname, email, description, etc..
+
+`users/forms.py`
+```python
+...
+
+class UserUpdateForm(forms.ModelForm):
+    
+    email = forms.EmailField()
+
+    class Meta:
+        model = get_user_model()
+        fields = ['first_name', 'last_name', 'email', 'description']
+
+```
+
+> This is a basic ass user profile form and model. I am going to create a new one once I get through these tutorials and have the examplaes I need to make the changes I want. 
+
