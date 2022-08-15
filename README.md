@@ -829,3 +829,15 @@ AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend']
 ```
 
 - That should override the django authentication settings
+
+
+---
+
+# TUTORIAL 11: Implementing Google reCAPTCHA security
+---
+
+
+The first thing you have to do to implement reCAPTCHA is go to the [google reCAPTCHA website](https://www.google.com/recaptcha/about/) create an account (or if you already have an account, create a new website instance to use). 
+
+Next, I need to install the third party django package, __django-recaptcha__, using `pip`: 
+    `pip install django-recaptcha`
