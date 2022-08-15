@@ -841,3 +841,48 @@ The first thing you have to do to implement reCAPTCHA is go to the [google reCAP
 
 Next, I need to install the third party django package, __django-recaptcha__, using `pip`: 
     `pip install django-recaptcha`
+
+> Once the pip package is installed, I need to go to settings and add the `captcha` package to `INSTALLED_APPS`
+
+Now I will add the captcha field to my form in the `users/forms.py` file:
+ 
+```python
+...
+# THIS NEED TO BE IMPORTED TO THE SCRIPT
+from captcha.fields import ReCaptchaField
+from captcha.widgets import ReCaptchaV2Checkbox
+...
+
+
+class UserLoginForm(AuthenticationForm):
+
+    def __init__(self,*args, **kwargs):
+        super(UserLoginForm, self).__init__(*args, **kwargs)
+
+    username = forms.CharField(
+        widget=forms.TextInput(
+            attrs={'class': 'form-control', 'placeholder': 'Username of Email'}),
+            label="Username or Email")
+
+    password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={'class': 'form-control', 'placeholder': 'Password'}))
+
+    # ================================================================================= #
+    # THIS IS WHAT WAS ADDED FOR THE reCAPTCHA FIELD
+    # ================================================================================= #
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(attrs={'data-theme': 'dark'}))
+```
+
+- In the settings file I added the public and private keys as well as a setting that is used for the development version of the website. Once the website/app is launched, then this setting will be removed. 
+
+`django_site/settings.py`
+```python
+# ADDING THE RECAPTCHA SETTINGS:
+RECAPTCHA_PUBLIC_KEY = '6Lc09nchAAAAAPzFjaRfenIGDOYgHr3X1uqgzBKX'
+RECAPTCHA_PRIVATE_KEY = '6Lc09nchAAAAAF9qc3Rx0sXOgrbni9eU4XEHNRFr'
+# I have to add this to the development version
+SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']
+```
+
+Now, I need to change the message that is displayed if the user fails to use the captcha checkbox when signing in. I can use my debug script to see where and how to change the message that is displayed by default with the reCAPTCHA 

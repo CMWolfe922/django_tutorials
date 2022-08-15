@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'fontawesomefree',
     'crispy_forms',
     'crispy_bootstrap5',
+    'captcha', # additional settings at bottom of page
 
 ]
 
@@ -180,4 +181,9 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 # Adding the backend authentication setting that I created for the EmailBackend object
 AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend']
 
+# ADDING THE RECAPTCHA SETTINGS:
+RECAPTCHA_PUBLIC_KEY = '6Lc09nchAAAAAPzFjaRfenIGDOYgHr3X1uqgzBKX'
+RECAPTCHA_PRIVATE_KEY = '6Lc09nchAAAAAF9qc3Rx0sXOgrbni9eU4XEHNRFr'
+# I have to add this to the development version
+SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']
 # ============================================================================ #
