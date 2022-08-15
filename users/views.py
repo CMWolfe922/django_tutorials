@@ -5,12 +5,11 @@ from .forms import UserRegistrationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 
+from .decorators import user_not_authenticated
+
 # Create your views here.
+@user_not_authenticated # checks if user is authenticated or not and sends to home page if they are
 def register(request):
-    # Check if the user is logged in already or not:
-    if request.user.is_authenticated:
-        # if user is already logged in, send them to homepage
-        return redirect('/')
     # Check if the request method equals POST
     if request.method == "POST":
         # create a form variable and feed it the request.POST submission
@@ -42,10 +41,8 @@ def custom_logout(request):
     messages.info(request, "Logged out successfully!")
     return redirect("homepage")
 
-
+@user_not_authenticated 
 def custom_login(request):
-    if request.user.is_authenticated:
-        return redirect("homepage")
 
     if request.method == "POST":
         form = AuthenticationForm(request=request, data=request.POST)
