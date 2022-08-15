@@ -979,3 +979,49 @@ class UserUpdateForm(forms.ModelForm):
 
 > This is a basic ass user profile form and model. I am going to create a new one once I get through these tutorials and have the examplaes I need to make the changes I want. 
 
+This is the new html file:
+
+`users/templates/users/profile.html`
+```html
+{% extends "main/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="content-section col-lg-12 col-md-12 col-sm-12 tutorial-style" style="min-height:65vh;">
+    <legend class="border-bottom mb-4">Profile Information:</legend>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="media">
+            <div class="media-body">
+                <h2 class="account-heading">{{ form.instance.username }}
+                    <small class="text-muted">({{ form.instance.status }})</small>
+                </h2>
+                <p class="text-secondary">{{ form.instance.first_name }} {{ form.instance.last_name }}</p>
+                <p class="text-secondary">{{ form.instance.email }}</p>
+                <p class="text-secondary">{{ form.instance.description }}</p>
+            </div>
+        </div>
+
+        {% if user.username == form.instance.username %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Edit Profile Information</legend>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.first_name|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.last_name|as_crispy_field }}
+                    </div>
+                </div> 
+                {{ form.email|as_crispy_field }}
+                {{ form.description|as_crispy_field }}
+
+                <a href="/">Change password?</a>
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Update</button>
+            </div>
+        {% endif %}
+    </form>
+</div>
+{% endblock content %}
+```
