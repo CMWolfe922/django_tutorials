@@ -790,6 +790,42 @@ To start off, create a new script file in the `users` app called `backends.py`
 
 `users/backends.py`
 ```python
+from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth import get_user_model
+from django.db.models import Q
 
+UserModel = get_user_model()
+class EmailBackend(ModelBackend):
+    """
+    Authenticates against settings.AUTH_USER_MODEL.
+    """
+
+    def authenticate(self, request, username=None, password=None, **kwargs):
+        try: 
+            # This basically queries the database in search of a match for the username or email
+            user = UserModel.objects.get(Q(username__iexact=username) | Q(email__iexact=username))
+
+        # Now I need to create an exception incase there is no such username or email in the database:
+        except UserModel.DoesNotExist:
+            UserModel().set_password(password)
+            return
+
+        except UserModel.MultipleObjectsReturned:
+            user = UserModel.objects.get(Q(username__iexact=username) | Q(email__iexact=username)).order_by('id').first()
+
+        if user.check_password(password) and self.user_can_authenticate(user):
+            return user
 
 ```
+
+- Now that the `EmailBackend` object is built, I need to go to the `settings.py` file and modify some of the settings so that I can implement my new backend. 
+
+in `settings.py` add the following changes:
+
+`django_site/settings.py`
+```python
+# Adding the backend authentication setting that I created for the EmailBackend object
+AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend']
+```
+
+- That should override the django authentication settings

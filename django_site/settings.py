@@ -177,4 +177,7 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
+# Adding the backend authentication setting that I created for the EmailBackend object
+AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend']
+
 # ============================================================================ #
