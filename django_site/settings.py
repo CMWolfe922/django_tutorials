@@ -41,7 +41,6 @@ INSTALLED_APPS = [
 
     # MY CREATED APPS:
     'main',
-    'django_site',
     'users', # You should always create a custom user model for each project
 
     # INSTALLED DJANGO APPS:
@@ -145,7 +144,7 @@ MEDIA_URL = 'media/'
 
 # CREATE THE REDIRECT URL
 LOGIN_REDIRECT_URL = '/'
-
+LOGIN_URL = 'login'
 # This must be added in order for the custom user model to work properly. Also,
 # if you have already ran migrations, you have to delete all the existing migrations
 # as well as the database. Thats why this should be done first before anything else

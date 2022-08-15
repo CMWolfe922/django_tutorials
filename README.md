@@ -598,3 +598,139 @@ urlpatterns = [
 
 > Now that I have the basic files created I can update the navbar.html file to include the logic and user authentication to determine what to show: 
 
+
+
+# TUTORIAL 10: Django Decorators and Email Login
+---
+
+
+> This tutorial will be about learning to use Django decorators. Decorators can be used to require login, catching errors, and many other tasks.
+
+- Decorators can accept arguments and are used to change the behavior of functions. 
+
+To get started, I will create a new script file `decorators.py` in the `users` app. I will copy and paste the code below and then describe what the code does. 
+
+`users/decorators.py`
+```python
+from django.shortcuts import redirect
+
+
+# Create a basic function for user not authenticated
+def user_not_authenticated(function=None, redirect_url='/'):
+    """
+    :description: The main purpose of this decorator function is check if the user 
+    is authenticated or not. If the user is authenticated then we need to redirect
+    the user back to specified url. (USuaully Homepage) 
+
+    :param functions: 
+
+    :param redirect_url:
+    """
+
+    # Now create another function inside this function called decorator
+    def decorator(view_func):
+        # and then one more function called _wrapped_view
+        def _wrapped_view(request, *args, **kwargs):
+            # This will return the user to the homepage if the user is authenticated
+            if request.user.is_authenticated:
+                return redirect(redirect_url)
+
+            # but if the above check doesn't work, we still need to return something. 
+            # in this case it will be the view function
+            return  view_func(request, *args, **kwargs)
+
+        return _wrapped_view
+
+    if function: # is not None
+        # then return the decorator function that you want to use
+        return decorator(function)
+
+    return decorator
+```
+
+- This decorator function allows me to remove some code out of the view functions. Below shows what code it replaces:
+
+`users/views.py`
+```python
+from django.shortcuts import render, redirect
+from django.contrib.auth import get_user_model, login, logout, authenticate
+from django.contrib import messages
+from .forms import UserRegistrationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
+
+from .decorators import user_not_authenticated
+
+# Create your views here.
+@user_not_authenticated
+def register(request):
+    # BELOW CODE IS REPLACED BY THE DECORATOR FUNCTION
+    # ============================================================================== #
+    # # Check if the user is logged in already or not:
+    # if request.user.is_authenticated:
+    #     # if user is already logged in, send them to homepage
+    #     return redirect('/')
+    # ============================================================================== #
+    # Check if the request method equals POST
+    if request.method == "POST":
+        # create a form variable and feed it the request.POST submission
+        form = UserRegistrationForm(request.POST)
+        # then check if form is valid
+        if form.is_valid():
+            # if form is valid save it and then login to the account and get redirected to homepage
+            user = form.save()
+            login(request, user)
+            messages.success(request, f"New account created: {user.username}")
+            return redirect('/')
+
+        else:
+            for error in list(form.errors.values()):
+                messages.error(request, error)
+
+    else:
+        form = UserRegistrationForm()
+
+    return render(
+        request=request,
+        template_name = "users/register.html",
+        context={"form": form}
+        )
+
+@login_required
+def custom_logout(request):
+    logout(request)
+    messages.info(request, "Logged out successfully!")
+    return redirect("homepage")
+
+@user_not_authenticated
+def custom_login(request):
+    # BELOW CODE IS REPLACED BY THE DECORATOR FUNCTION
+    # ============================================================================== #
+    # if request.user.is_authenticated:
+    #     return redirect("homepage")
+    # ============================================================================== #
+
+    if request.method == "POST":
+        form = AuthenticationForm(request=request, data=request.POST)
+        if form.is_valid():
+            user = authenticate(
+                username=form.cleaned_data["username"],
+                password=form.cleaned_data["password"],
+            )
+            if user is not None:
+                login(request, user)
+                messages.success(request, f"Hello <b>{user.username}</b>! You have been logged in!")
+                return redirect("homepage")
+        
+        else:
+            for error in list(form.errors.values()):
+                messages.error(request, error)
+
+    form = AuthenticationForm()
+
+    return render(
+        request=request,
+        template_name="users/login.html",
+        context={"form": form},
+    )
+```
