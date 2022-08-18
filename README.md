@@ -1,7 +1,11 @@
-# django_tutorials
-Django tutorials on all the basics of building web apps using Django. This course is just to cover the basics and to have something to reference at all times. 
+# django_tutorials --> PostgreSQL Database Version
+### This version is only available on my Desktop
 
-- Also, if you are cloning/downloading this repository for the first time you will need to set it up. If you notice there is a `bin/` directory. Inside that directory is two scripts. One for a windows operating system and the other for ubuntu. So before running the appropriate shell script make sure you are in the `django_tutorials` root directory and then run: 
+> any additional commands or branches created on my desktop will be named with an ending of `-postgres`
+
+Django tutorials on all the basics of building web apps using Django. This course is just to cover the basics and to have something to reference at all times.
+
+- Also, if you are cloning/downloading this repository for the first time you will need to set it up. If you notice there is a `bin/` directory. Inside that directory is two scripts. One for a windows operating system and the other for ubuntu. So before running the appropriate shell script make sure you are in the `django_tutorials` root directory and then run:
 
 > ```sh . ./bin/setup_env.sh ``` OR ```sh . ./bin/setup_env_ubuntu.sh ```
 
@@ -240,9 +244,9 @@ def register(request):
 
 #### NOW LETS MOVE TO THE DJANGO MESSAGING TUTORIAL:
 
-We can display messages to users using the django messaging framework. I can also control how they are displayed and who sees them. 
+We can display messages to users using the django messaging framework. I can also control how they are displayed and who sees them.
 
-One use case would be to notify the user (after they register) that they have successfully registered, or that they need to fix something to register. This can also be used for any task in the app that requires the user to submit a form or perform a task. 
+One use case would be to notify the user (after they register) that they have successfully registered, or that they need to fix something to register. This can also be used for any task in the app that requires the user to submit a form or perform a task.
     - adding contacts
     - messaging someone else - success message
     - logging in and out - message confirming either
@@ -252,7 +256,7 @@ One use case would be to notify the user (after they register) that they have su
 
 > So to start I will go to the `views.py` file in the `users` app and then begin adding messages their:
 
-- So to do this I will have to import the messages packages `from django.contrib import messages` . Then after the `login(request, user)` line, I will add the messages function/method to create a message upon successfully logging in: 
+- So to do this I will have to import the messages packages `from django.contrib import messages` . Then after the `login(request, user)` line, I will add the messages function/method to create a message upon successfully logging in:
 
 ```python
 from django.shortcuts import render, redirect
@@ -298,7 +302,7 @@ def register(request):
 
 - The best place to create a template to handle a message template is after our navbar since every file will have the navbar.
 
-So inside the `main` app, go to the `templates/includes/` directory and add a `messaging.html` file. This will be the same directory that has the `navbar.html` file inside of it. 
+So inside the `main` app, go to the `templates/includes/` directory and add a `messaging.html` file. This will be the same directory that has the `navbar.html` file inside of it.
 
 > This is the `messaging.html` template
 
@@ -337,12 +341,12 @@ So inside the `main` app, go to the `templates/includes/` directory and add a `m
 {% endif %}
 ```
 
-### Now that the messaging template is created: 
+### Now that the messaging template is created:
 ---
 
 > I have to go the `base.html` file and then add the `messaging.html` template to an include statement after the row and column sections:
 
-`base.html` setup from before: 
+`base.html` setup from before:
 
 ```html
 {% load static %}
@@ -463,7 +467,7 @@ This is the new setup for the `base.html` file:
 
 - Now if I fillout the registration form with wrong information, I should receive a message stating what I did wrong...
 
-- The messages worked. They were displayed at the top letting me know when an error or some other information occured. 
+- The messages worked. They were displayed at the top letting me know when an error or some other information occured.
 
 
 ===
@@ -475,7 +479,7 @@ This is the new setup for the `base.html` file:
 
 To startout I will focus on the `navbar.html` because here I can change which icons show up regarding the login or logout icons. I can run an if statement check to see if the user is logged in or not. To do this I will use the classic `{% if user.is_authenticated %}`
 
-- A simple way to get started adding this into a file is by going close to where you want to implement this inside the file and just create the if, else and endif django tags so that you can easily insert the proper code where it goes: 
+- A simple way to get started adding this into a file is by going close to where you want to implement this inside the file and just create the if, else and endif django tags so that you can easily insert the proper code where it goes:
 
 ```html
 ...
@@ -543,7 +547,7 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path("register/", views.register, name="register"),
     # ============================================================================================ #
-    # THESE ARE THE ADDED URLS: 
+    # THESE ARE THE ADDED URLS:
     # ============================================================================================ #
     # Now create my new login and logout paths:
     path('login', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'),
@@ -553,7 +557,7 @@ urlpatterns = [
 
 - First I created the `login.html` file so that users can freely login and logout:
 ###### `login.html`
-```html 
+```html
 {% extends "main/base.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
@@ -580,7 +584,7 @@ urlpatterns = [
 {% endblock %}
 ```
 
-- The next file created was the logout file. 
+- The next file created was the logout file.
 ###### `logout.html`
 ```html
 {% extends "main/base.html" %}
@@ -596,7 +600,7 @@ urlpatterns = [
 {% endblock %}
 ```
 
-> Now that I have the basic files created I can update the navbar.html file to include the logic and user authentication to determine what to show: 
+> Now that I have the basic files created I can update the navbar.html file to include the logic and user authentication to determine what to show:
 
 
 
@@ -606,9 +610,9 @@ urlpatterns = [
 
 > This tutorial will be about learning to use Django decorators. Decorators can be used to require login, catching errors, and many other tasks.
 
-- Decorators can accept arguments and are used to change the behavior of functions. 
+- Decorators can accept arguments and are used to change the behavior of functions.
 
-To get started, I will create a new script file `decorators.py` in the `users` app. I will copy and paste the code below and then describe what the code does. 
+To get started, I will create a new script file `decorators.py` in the `users` app. I will copy and paste the code below and then describe what the code does.
 
 `users/decorators.py`
 ```python
@@ -618,11 +622,11 @@ from django.shortcuts import redirect
 # Create a basic function for user not authenticated
 def user_not_authenticated(function=None, redirect_url='/'):
     """
-    :description: The main purpose of this decorator function is check if the user 
+    :description: The main purpose of this decorator function is check if the user
     is authenticated or not. If the user is authenticated then we need to redirect
-    the user back to specified url. (USuaully Homepage) 
+    the user back to specified url. (USuaully Homepage)
 
-    :param functions: 
+    :param functions:
 
     :param redirect_url:
     """
@@ -635,7 +639,7 @@ def user_not_authenticated(function=None, redirect_url='/'):
             if request.user.is_authenticated:
                 return redirect(redirect_url)
 
-            # but if the above check doesn't work, we still need to return something. 
+            # but if the above check doesn't work, we still need to return something.
             # in this case it will be the view function
             return  view_func(request, *args, **kwargs)
 
@@ -721,7 +725,7 @@ def custom_login(request):
                 login(request, user)
                 messages.success(request, f"Hello <b>{user.username}</b>! You have been logged in!")
                 return redirect("homepage")
-        
+
         else:
             for error in list(form.errors.values()):
                 messages.error(request, error)
@@ -738,12 +742,12 @@ def custom_login(request):
 
 #### Tutorial 10: Email Login Form
 
-> Now I will create a custom email login form. This will basically be a custom authentication system by creating some work around hacks. 
+> Now I will create a custom email login form. This will basically be a custom authentication system by creating some work around hacks.
 
-So in the `users/forms.py` file I will create a new form object that I will add to the registration and login process. 
+So in the `users/forms.py` file I will create a new form object that I will add to the registration and login process.
 
 `users/forms.py`
-```python 
+```python
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm # <---- ADDED THE AuthenticationForm import as well
 from django.contrib.auth import get_user_model
@@ -784,7 +788,7 @@ class UserLoginForm(AuthenticationForm):
 
 In order to use the new `UserLoginForm`, I will have to import this to the `users/view.py` file and then replace the `AuthenticationForm` objects with the new `UserLoginForm` object
 
-Now that we have the `UserLoginForm` created and working, I need to now create an authentication for the backend. This way the login process and emails can be authenticated properly using a custom authentication process. 
+Now that we have the `UserLoginForm` created and working, I need to now create an authentication for the backend. This way the login process and emails can be authenticated properly using a custom authentication process.
 
 To start off, create a new script file in the `users` app called `backends.py`
 
@@ -801,7 +805,7 @@ class EmailBackend(ModelBackend):
     """
 
     def authenticate(self, request, username=None, password=None, **kwargs):
-        try: 
+        try:
             # This basically queries the database in search of a match for the username or email
             user = UserModel.objects.get(Q(username__iexact=username) | Q(email__iexact=username))
 
@@ -818,7 +822,7 @@ class EmailBackend(ModelBackend):
 
 ```
 
-- Now that the `EmailBackend` object is built, I need to go to the `settings.py` file and modify some of the settings so that I can implement my new backend. 
+- Now that the `EmailBackend` object is built, I need to go to the `settings.py` file and modify some of the settings so that I can implement my new backend.
 
 in `settings.py` add the following changes:
 
@@ -837,15 +841,15 @@ AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend']
 ---
 
 
-The first thing you have to do to implement reCAPTCHA is go to the [google reCAPTCHA website](https://www.google.com/recaptcha/about/) create an account (or if you already have an account, create a new website instance to use). 
+The first thing you have to do to implement reCAPTCHA is go to the [google reCAPTCHA website](https://www.google.com/recaptcha/about/) create an account (or if you already have an account, create a new website instance to use).
 
-Next, I need to install the third party django package, __django-recaptcha__, using `pip`: 
+Next, I need to install the third party django package, __django-recaptcha__, using `pip`:
     `pip install django-recaptcha`
 
 > Once the pip package is installed, I need to go to settings and add the `captcha` package to `INSTALLED_APPS`
 
 Now I will add the captcha field to my form in the `users/forms.py` file:
- 
+
 ```python
 ...
 # THIS NEED TO BE IMPORTED TO THE SCRIPT
@@ -874,7 +878,7 @@ class UserLoginForm(AuthenticationForm):
     captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(attrs={'data-theme': 'dark'}))
 ```
 
-- In the settings file I added the public and private keys as well as a setting that is used for the development version of the website. Once the website/app is launched, then this setting will be removed. 
+- In the settings file I added the public and private keys as well as a setting that is used for the development version of the website. Once the website/app is launched, then this setting will be removed.
 
 `django_site/settings.py`
 ```python
@@ -892,7 +896,7 @@ To change the message, you have to change the message in the `users/views.py` fi
 `users/views.py`
 ```python
 
-@user_not_authenticated 
+@user_not_authenticated
 def custom_login(request):
 
     if request.method == "POST":
@@ -906,7 +910,7 @@ def custom_login(request):
                 login(request, user)
                 messages.success(request, f"Hello <b>{user.username}</b>! You have been logged in!")
                 return redirect("homepage")
-        
+
         else:
             # ================================================================================================ #
             # THIS IS THE NEW ELSE CLAUSE FOR HANDLING ERROR MESSAGES
@@ -933,14 +937,14 @@ def custom_login(request):
     )
 ```
 
-There are other customizeable features regarding reCAPTCHA and the version of security you want. For more information just checkout the docs on the [django-recaptcha github page](https://github.com/torchbox/django-recaptcha) 
+There are other customizeable features regarding reCAPTCHA and the version of security you want. For more information just checkout the docs on the [django-recaptcha github page](https://github.com/torchbox/django-recaptcha)
 ---
 
 
 # TUTORIAL 12: User Profiles
 ---
 
-This tutorial will show how to create user profiles. I will create the urlpattern based on the username and the view and form will be created inside the `users` app. 
+This tutorial will show how to create user profiles. I will create the urlpattern based on the username and the view and form will be created inside the `users` app.
 
 To get started I will go to the `users/url.py` file and add a new pattern:
 
@@ -959,7 +963,7 @@ urlpatterns = [
 ]
 ```
 
-- Next thing I will need to do is go to the `users/forms.py` file and begin creating the new profile form to allow users to create new profiles and update them. I will create a form called `UserUpdateForm` since it will basically be updating the custom user signup form. 
+- Next thing I will need to do is go to the `users/forms.py` file and begin creating the new profile form to allow users to create new profiles and update them. I will create a form called `UserUpdateForm` since it will basically be updating the custom user signup form.
 
 I will basically just be using the `CustomUser` model that I have already created to get the name, surname, email, description, etc..
 
@@ -968,7 +972,7 @@ I will basically just be using the `CustomUser` model that I have already create
 ...
 
 class UserUpdateForm(forms.ModelForm):
-    
+
     email = forms.EmailField()
 
     class Meta:
@@ -977,7 +981,7 @@ class UserUpdateForm(forms.ModelForm):
 
 ```
 
-> This is a basic ass user profile form and model. I am going to create a new one once I get through these tutorials and have the examplaes I need to make the changes I want. 
+> This is a basic ass user profile form and model. I am going to create a new one once I get through these tutorials and have the examplaes I need to make the changes I want.
 
 This is the new html file:
 
@@ -1011,7 +1015,7 @@ This is the new html file:
                     <div class="form-group col-md-6 mb-0">
                         {{ form.last_name|as_crispy_field }}
                     </div>
-                </div> 
+                </div>
                 {{ form.email|as_crispy_field }}
                 {{ form.description|as_crispy_field }}
 
