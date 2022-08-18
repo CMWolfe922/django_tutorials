@@ -1029,3 +1029,22 @@ This is the new html file:
 </div>
 {% endblock content %}
 ```
+
+## tutorial-12-postgres
+---
+
+I changed the database to a PostgreSQL database I named the database `sobering` and changed the `settings.py` file to:
+
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'sobering',
+        'USER': 'soberingadmin',
+        'PASSWORD': 'MZMfib112358!#',
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
+
+```
