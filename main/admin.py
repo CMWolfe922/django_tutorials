@@ -7,7 +7,7 @@ class ArticleSeriesAdmin(admin.ModelAdmin):
     fields = [
         'title',
         'subtitle',
-        'series_slug',
+        'slug',
         # 'publish_date',
     ]
 
