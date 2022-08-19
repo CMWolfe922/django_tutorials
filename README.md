@@ -1177,5 +1177,29 @@ class Article(models.Model):
 
 `main/static/main/main.css`
 ```css
+...
 
+
+.aspect-ratio-box {
+    position: relative;
+    border-bottom: 2px;
+}
+
+.aspect-ratio-box::after {
+    display: block;
+    content: '';
+    /* 16:9 Aspect Ratio, 9 / 16 * 100% */
+    padding-bottom: 56.25%;
+}
+
+.aspect-ratio-box img {
+    position: relative;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+}
 ```
+
+I added this code to the bottom of the css file
+
