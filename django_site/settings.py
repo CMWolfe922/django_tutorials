@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -172,11 +173,15 @@ TINYMCE_DEFAULT_CONFIG = {
     "custom_undo_redo_levels": 10,
     # "language": "es_ES",  # To force a specific language instead of the Django current language.
 }
+
 TINYMCE_SPELLCHECKER = True
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+# CREATING THE MEDDIA 
+MEDIA_URL = os.path.join(BASE_DIR, 'media/')
 
 # Adding the backend authentication setting that I created for the EmailBackend object
 AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend']
