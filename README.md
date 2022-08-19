@@ -1025,3 +1025,157 @@ This is the new html file:
 </div>
 {% endblock content %}
 ```
+
+
+---
+
+
+# TUTORIAL 13: Uploading and Managing Images
+---
+
+
+In this tutorial I will learn how to manage images that are added to the site and then display them.
+
+- To start I will have to add a new setting in the `settings.py` file:
+
+`settings.py`
+```python
+# CREATING THE MEDIA URL MANAGER
+MEDIA_URL = os.path.join(BASE_DIR, 'media/')
+```
+
+Once this has been done I will then need to create a new directory to hold the media files. Obviously the name of that directory will be called `media` and it will be in the projects root directory.
+
+- Next I will create a `default` directory inside the `media` directory. This is where the "default" photos will be loaded from. So the structure of the media directory will be `media/default/default_image.jpeg` where the default images are images that are loaded by default if one isn't added by the user. 
+
+- Now that I have the media directory and the settings changed, I can now update the models. I will have to add an image field to the models in order to add it to the admin file and be able to edit the article and series objects in the admin dashboard. 
+
+##### The `models.py` updated version:
+
+`main/models.py`
+```python
+from django.db import models
+from django.utils import timezone
+# in order to use the tinymce app in my website models, I have to import it into models
+# and then change the textfields that I want to use this app to HTMLField
+from tinymce.models import HTMLField
+from django.contrib.auth import get_user_model
+
+from django.template.defaultfilters import slugify
+import os
+
+
+class ArticleSeries(models.Model):
+    ###############################################################################################################
+    # UPDATED VERSION OF IMAGE
+    # ----------------------------------------------------------------------------------------------------------- #
+    def image_upload_to(self, instance=None):
+        if instance:
+            return os.path.join("ArticleSeries", slugify(self.slug), instance)
+        return None
+    # ----------------------------------------------------------------------------------------------------------- #
+
+    title = models.CharField(max_length=150)
+    subtitle = models.CharField(max_length=255, default="", blank=True)
+    slug = models.SlugField('Series slug', null=False, blank=False, unique=True)
+    publish_date = models.DateTimeField("Date Published", default=timezone.now)
+    ###############################################################################################################
+    # UPDATES
+    # ----------------------------------------------------------------------------------------------------------- #
+    author = models.ForeignKey(get_user_model(), default=1, on_delete=models.SET_DEFAULT)
+    image = models.ImageField(default='default/no_image_available.png', max_length=255, upload_to=image_upload_to)
+    # ----------------------------------------------------------------------------------------------------------- #
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name_plural = 'Series'
+        ordering = ['-publish_date']
+
+class Article(models.Model):
+    ###############################################################################################################
+    # UPDATED upload_to FOR ARTICLE
+    # ----------------------------------------------------------------------------------------------------------- #
+    def image_upload_to(self, instance=None):
+        if instance:
+            return os.path.join("ArticleSeries", slugify(self.series.slug), slugify(self.article_slug), instance)
+        return None
+    # ----------------------------------------------------------------------------------------------------------- #
+
+    title = models.CharField(max_length=150)
+    subtitle = models.CharField(max_length=255, default="", blank=True)
+    article_slug = models.SlugField('Article slug', null=False, blank=False, unique=True)
+    content = HTMLField(blank=True, default="")
+    # create a new field for notes then add it to the admin.py files fieldset
+    notes = HTMLField(blank=True, default="")
+    publish_date = models.DateTimeField("Date Published", default=timezone.now)
+    modified = models.DateTimeField("Date Modified", default=timezone.now)
+    series = models.ForeignKey(ArticleSeries, default='', verbose_name='Series', on_delete=models.SET_DEFAULT)
+    ###############################################################################################################
+    # UPDATES
+    # ----------------------------------------------------------------------------------------------------------- #
+    author = models.ForeignKey(get_user_model(), default=1, on_delete=models.SET_DEFAULT)
+    image = models.ImageField(default='default/no_image_available.png', max_length=255, upload_to=image_upload_to)
+    # ----------------------------------------------------------------------------------------------------------- #
+
+    # Create a __str__ method
+    def __str__(self):
+        return self.title
+
+    # I need to create a method that creates a slug field and use property decorator
+    @property
+    def slug(self):
+        return self.series.slug + '/' + self.article_slug
+
+    class Meta:
+        verbose_name_plural = "Article"
+        ordering = ['-publish_date']
+
+```
+
+- Now that these changes have been made, I will have to update the `main/templates/main/home.html` file. I will need to change the image src url and then to adjust the image size, I will need to use the css code inside the class of a `<div>` tag. I will put a div around the `<img>` tag and give it a class name of `<div class="aspect-ratio-box">`
+
+`main/templates/main/home.html`
+```html
+{% extends 'main/base.html' %}
+{% block content %}
+<div class="row display-flex justify-content-center">
+    {% for object in objects %}
+    <div class="col-lg-4 col-md-6 col-sm-12 mobiledevice mt-3 mb-2">
+        <article class="media content-section customhover" style="height: 95%;">
+            <div class="media-body">
+                <a href="/{{object.slug}}">
+                ###############################################################################################################
+                # UPDATES
+                # ----------------------------------------------------------------------------------------------------------- #
+                    <div class="aspect-ratio-box">
+                        <img class="img-fluid" src="{{ object.image.url }}" alt="">
+                    </div>
+                # ----------------------------------------------------------------------------------------------------------- #
+                </a>
+                <div>
+                    <a class="article-title line-clamp-2 title-style" style="font-size:22px"
+                        href="/{{object.slug}}">
+                        {{ object.title }}
+                    </a>
+                    <a href="/{{object.slug}}" style="text-decoration: none;">
+                        <p class="article-content line-clamp-5 subtitle-style">{{ object.subtitle }}</p>
+                    </a>
+                </div>
+            </div>
+        </article>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
+
+```
+
+- Next I will update the css file in my main static directory:
+
+`main/static/main/main.css`
+```css
+
+```
