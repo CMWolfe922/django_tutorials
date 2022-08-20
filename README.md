@@ -1203,3 +1203,11 @@ class Article(models.Model):
 
 I added this code to the bottom of the css file
 
+---
+
+# TUTORIAL 13 (WITH JAVASCRIPT):
+---
+
+This branch will be to try and add javascript code to help the front end. I will try and add new features using javascript. Features I can keep for the rest of the project.
+
+
