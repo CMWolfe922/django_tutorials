@@ -7,7 +7,9 @@ class ArticleSeriesAdmin(admin.ModelAdmin):
     fields = [
         'title',
         'subtitle',
-        'series_slug',
+        'slug',
+        'author',
+        'image',
         # 'publish_date',
     ]
 
@@ -15,7 +17,7 @@ class ArticleSeriesAdmin(admin.ModelAdmin):
 class ArticleAdmin(admin.ModelAdmin):
 
     fieldsets = (
-        ('Header', {'fields': ['title', 'subtitle', 'article_slug', 'series']}),
+        ('Header', {'fields': ['title', 'subtitle', 'article_slug', 'series', 'author', 'image']}),
         ("Content", {'fields': ['content', 'notes']}),
         ("Date", {'fields': ['modified']}),
     )

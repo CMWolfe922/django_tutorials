@@ -488,4 +488,694 @@ To startout I will focus on the `navbar.html` because here I can change which ic
 
 ```
 
-> Now lets take the navbar and then begin to implement this. first, I must create a new branch 
+> Now lets take the navbar and then begin to implement this. first, I must create a new branch for tutorial 9: This will be the Login and Logout tutorial. I will also learn about verifiying user access and whether the user is logged in and has access to the data they request:
+
+Now I need to copy and paste the `navbar.html` file into this README file so that I can make the required changes:
+
+```html
+<header class="site-header" style="margin-bottom: 5px;">
+    <nav class="navbar navbar-expand-md navbar-color">
+        <div class="container">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link" href="/">Home</a>
+            </div>
+            <button aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler ml-auto float-right btncolor" data-target="#navbarToggle" data-toggle="collapse" type="text">
+                <i class="fas fa-bars fa-2x"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarToggle">
+                <!-- navbar left side -->
+                <div class="navbar-nav mr-auto">
+                    <a class="nav-item nav-link" href="/">About</a>
+                </div>
+                <!-- navbar Right Side -->
+                <!-- Where the user verification starts -->
+                <div class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <a class="nav-item nav-link" href="{% url 'logout' %}">
+                            Log Out <i class="fas fa-sign-out-alt"></i>
+                        </a>
+                    {% else %}
+                        <a class="nav-item nav-link" href="{% url 'login' %}">
+                            Login <i class="fas fa-sign-in-alt"></i>
+                        </a>
+                        <a class="nav-item nav-link" href="{% url 'register' %}">
+                            Sign Up <i class="fas fa-user-plus"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+```
+
+> When the above template was created in the README file, there was no such thing as the login or logout templates. So it would've created an error. Therefore, before adding this to the project file. I can now go and create the required templates. ALSO, I need to create the `urlpatterns`. On this topic, I will show what to do below:
+
+`users/urls.py`
+```python
+from django.urls import path
+from . import views
+# ============================================================================================ #
+# THIS WAS IMPORTED FOR THE BELOW URLPATTERNS
+from django.contrib.auth import views as auth_views
+
+
+urlpatterns = [
+    path("register/", views.register, name="register"),
+    # ============================================================================================ #
+    # THESE ARE THE ADDED URLS: 
+    # ============================================================================================ #
+    # Now create my new login and logout paths:
+    path('login', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'),
+    path('logout', auth_views.LogoutView.as_view(template_name='users/logout.html'), name='logout'),
+]
+```
+
+- First I created the `login.html` file so that users can freely login and logout:
+###### `login.html`
+```html 
+{% extends "main/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div>
+    <form method="POST">
+        {% csrf_token %}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Log In</legend>
+            {{ form|crispy }}
+        </fieldset>
+        <div class="form-group">
+            <button class="btn btn-outline-info" type="submit">Login</button>
+        </div>
+    </form>
+    <div class="border-top pt-3">
+        <small class="text-muted">
+            Need An Account? <a class="ml-2" href="{% url 'register' %}">Sign Up Now</a>
+        </small><br>
+        <small class="text-muted">
+            <a href="/">Forgot Password?</a>
+        </small>
+    </div>
+</div>
+{% endblock %}
+```
+
+- The next file created was the logout file. 
+###### `logout.html`
+```html
+{% extends "main/base.html" %}
+{% block content %}
+<div class="justify-content-center">
+    <h2> You have been successfully logged out! </h2>
+    <div class="border-top pt-3" style="min-height:65vh;">
+        <small class="text-muted">
+            <a href="{% url 'login' %}">Log In Again</a>
+        </small>
+    </div>
+</div>
+{% endblock %}
+```
+
+> Now that I have the basic files created I can update the navbar.html file to include the logic and user authentication to determine what to show: 
+
+
+
+# TUTORIAL 10: Django Decorators and Email Login
+---
+
+
+> This tutorial will be about learning to use Django decorators. Decorators can be used to require login, catching errors, and many other tasks.
+
+- Decorators can accept arguments and are used to change the behavior of functions. 
+
+To get started, I will create a new script file `decorators.py` in the `users` app. I will copy and paste the code below and then describe what the code does. 
+
+`users/decorators.py`
+```python
+from django.shortcuts import redirect
+
+
+# Create a basic function for user not authenticated
+def user_not_authenticated(function=None, redirect_url='/'):
+    """
+    :description: The main purpose of this decorator function is check if the user 
+    is authenticated or not. If the user is authenticated then we need to redirect
+    the user back to specified url. (USuaully Homepage) 
+
+    :param functions: 
+
+    :param redirect_url:
+    """
+
+    # Now create another function inside this function called decorator
+    def decorator(view_func):
+        # and then one more function called _wrapped_view
+        def _wrapped_view(request, *args, **kwargs):
+            # This will return the user to the homepage if the user is authenticated
+            if request.user.is_authenticated:
+                return redirect(redirect_url)
+
+            # but if the above check doesn't work, we still need to return something. 
+            # in this case it will be the view function
+            return  view_func(request, *args, **kwargs)
+
+        return _wrapped_view
+
+    if function: # is not None
+        # then return the decorator function that you want to use
+        return decorator(function)
+
+    return decorator
+```
+
+- This decorator function allows me to remove some code out of the view functions. Below shows what code it replaces:
+
+`users/views.py`
+```python
+from django.shortcuts import render, redirect
+from django.contrib.auth import get_user_model, login, logout, authenticate
+from django.contrib import messages
+from .forms import UserRegistrationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
+
+from .decorators import user_not_authenticated
+
+# Create your views here.
+@user_not_authenticated
+def register(request):
+    # BELOW CODE IS REPLACED BY THE DECORATOR FUNCTION
+    # ============================================================================== #
+    # # Check if the user is logged in already or not:
+    # if request.user.is_authenticated:
+    #     # if user is already logged in, send them to homepage
+    #     return redirect('/')
+    # ============================================================================== #
+    # Check if the request method equals POST
+    if request.method == "POST":
+        # create a form variable and feed it the request.POST submission
+        form = UserRegistrationForm(request.POST)
+        # then check if form is valid
+        if form.is_valid():
+            # if form is valid save it and then login to the account and get redirected to homepage
+            user = form.save()
+            login(request, user)
+            messages.success(request, f"New account created: {user.username}")
+            return redirect('/')
+
+        else:
+            for error in list(form.errors.values()):
+                messages.error(request, error)
+
+    else:
+        form = UserRegistrationForm()
+
+    return render(
+        request=request,
+        template_name = "users/register.html",
+        context={"form": form}
+        )
+
+@login_required
+def custom_logout(request):
+    logout(request)
+    messages.info(request, "Logged out successfully!")
+    return redirect("homepage")
+
+@user_not_authenticated
+def custom_login(request):
+    # BELOW CODE IS REPLACED BY THE DECORATOR FUNCTION
+    # ============================================================================== #
+    # if request.user.is_authenticated:
+    #     return redirect("homepage")
+    # ============================================================================== #
+
+    if request.method == "POST":
+        form = AuthenticationForm(request=request, data=request.POST)
+        if form.is_valid():
+            user = authenticate(
+                username=form.cleaned_data["username"],
+                password=form.cleaned_data["password"],
+            )
+            if user is not None:
+                login(request, user)
+                messages.success(request, f"Hello <b>{user.username}</b>! You have been logged in!")
+                return redirect("homepage")
+        
+        else:
+            for error in list(form.errors.values()):
+                messages.error(request, error)
+
+    form = AuthenticationForm()
+
+    return render(
+        request=request,
+        template_name="users/login.html",
+        context={"form": form},
+    )
+```
+
+
+#### Tutorial 10: Email Login Form
+
+> Now I will create a custom email login form. This will basically be a custom authentication system by creating some work around hacks. 
+
+So in the `users/forms.py` file I will create a new form object that I will add to the registration and login process. 
+
+`users/forms.py`
+```python 
+from django import forms
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm # <---- ADDED THE AuthenticationForm import as well
+from django.contrib.auth import get_user_model
+
+
+class UserRegistrationForm(UserCreationForm):
+    email = forms.EmailField(help_text='A valid email address, please.', required=True)
+
+    class Meta:
+        model = get_user_model()
+        fields = ['first_name', 'last_name', 'username', 'email', 'password1', 'password2']
+
+    def save(self, commit=True):
+        user = super(UserRegistrationForm, self).save(commit=False)
+        user.email = self.cleaned_data['email']
+        if commit:
+            user.save()
+
+        return user
+
+# ======================================================================================== #
+# ADDED THIS NEW USER LOGIN FORM OBJECT
+# ======================================================================================== #
+class UserLoginForm(AuthenticationForm):
+
+    def __init__(self,*args, **kwargs):
+        super(UserLoginForm, self).__init__(*args, **kwargs)
+
+    username = forms.CharField(
+        widget=forms.TextInput(
+            attrs={'class': 'form-control', 'placeholder': 'Username of Email'}),
+            label="Username or Email")
+
+    password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={'class': 'form-control', 'placeholder': 'Password'}))
+```
+
+In order to use the new `UserLoginForm`, I will have to import this to the `users/view.py` file and then replace the `AuthenticationForm` objects with the new `UserLoginForm` object
+
+Now that we have the `UserLoginForm` created and working, I need to now create an authentication for the backend. This way the login process and emails can be authenticated properly using a custom authentication process. 
+
+To start off, create a new script file in the `users` app called `backends.py`
+
+`users/backends.py`
+```python
+from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth import get_user_model
+from django.db.models import Q
+
+UserModel = get_user_model()
+class EmailBackend(ModelBackend):
+    """
+    Authenticates against settings.AUTH_USER_MODEL.
+    """
+
+    def authenticate(self, request, username=None, password=None, **kwargs):
+        try: 
+            # This basically queries the database in search of a match for the username or email
+            user = UserModel.objects.get(Q(username__iexact=username) | Q(email__iexact=username))
+
+        # Now I need to create an exception incase there is no such username or email in the database:
+        except UserModel.DoesNotExist:
+            UserModel().set_password(password)
+            return
+
+        except UserModel.MultipleObjectsReturned:
+            user = UserModel.objects.get(Q(username__iexact=username) | Q(email__iexact=username)).order_by('id').first()
+
+        if user.check_password(password) and self.user_can_authenticate(user):
+            return user
+
+```
+
+- Now that the `EmailBackend` object is built, I need to go to the `settings.py` file and modify some of the settings so that I can implement my new backend. 
+
+in `settings.py` add the following changes:
+
+`django_site/settings.py`
+```python
+# Adding the backend authentication setting that I created for the EmailBackend object
+AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend']
+```
+
+- That should override the django authentication settings
+
+
+---
+
+# TUTORIAL 11: Implementing Google reCAPTCHA security
+---
+
+
+The first thing you have to do to implement reCAPTCHA is go to the [google reCAPTCHA website](https://www.google.com/recaptcha/about/) create an account (or if you already have an account, create a new website instance to use). 
+
+Next, I need to install the third party django package, __django-recaptcha__, using `pip`: 
+    `pip install django-recaptcha`
+
+> Once the pip package is installed, I need to go to settings and add the `captcha` package to `INSTALLED_APPS`
+
+Now I will add the captcha field to my form in the `users/forms.py` file:
+ 
+```python
+...
+# THIS NEED TO BE IMPORTED TO THE SCRIPT
+from captcha.fields import ReCaptchaField
+from captcha.widgets import ReCaptchaV2Checkbox
+...
+
+
+class UserLoginForm(AuthenticationForm):
+
+    def __init__(self,*args, **kwargs):
+        super(UserLoginForm, self).__init__(*args, **kwargs)
+
+    username = forms.CharField(
+        widget=forms.TextInput(
+            attrs={'class': 'form-control', 'placeholder': 'Username of Email'}),
+            label="Username or Email")
+
+    password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={'class': 'form-control', 'placeholder': 'Password'}))
+
+    # ================================================================================= #
+    # THIS IS WHAT WAS ADDED FOR THE reCAPTCHA FIELD
+    # ================================================================================= #
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(attrs={'data-theme': 'dark'}))
+```
+
+- In the settings file I added the public and private keys as well as a setting that is used for the development version of the website. Once the website/app is launched, then this setting will be removed. 
+
+`django_site/settings.py`
+```python
+# ADDING THE RECAPTCHA SETTINGS:
+RECAPTCHA_PUBLIC_KEY = '6Lc09nchAAAAAPzFjaRfenIGDOYgHr3X1uqgzBKX'
+RECAPTCHA_PRIVATE_KEY = '6Lc09nchAAAAAF9qc3Rx0sXOgrbni9eU4XEHNRFr'
+# I have to add this to the development version
+SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']
+```
+
+Now, I need to change the message that is displayed if the user fails to use the captcha checkbox when signing in. I can use my debug script to see where and how to change the message that is displayed by default with the reCAPTCHA.
+
+To change the message, you have to change the message in the `users/views.py` file. Where the login view function is, there is a spot that handles error messages. This is where the changes will be made.
+
+`users/views.py`
+```python
+
+@user_not_authenticated 
+def custom_login(request):
+
+    if request.method == "POST":
+        form = UserLoginForm(request=request, data=request.POST)
+        if form.is_valid():
+            user = authenticate(
+                username=form.cleaned_data["username"],
+                password=form.cleaned_data["password"],
+            )
+            if user is not None:
+                login(request, user)
+                messages.success(request, f"Hello <b>{user.username}</b>! You have been logged in!")
+                return redirect("homepage")
+        
+        else:
+            # ================================================================================================ #
+            # THIS IS THE NEW ELSE CLAUSE FOR HANDLING ERROR MESSAGES
+            # ================================================================================================ #
+            for key, error in list(form.errors.items()):
+                if key == 'captcha' and error[0] == 'This field is required.':
+                    messages.error(request, "You must pass the reCAPTCHA test!")
+                    continue
+                messages.error(request, error)
+            # ================================================================================================ #
+            # OLD VERSION:
+            # ================================================================================================ #
+            # for error in list(form.errors.values()):
+            #     messages.error(request, error)
+
+            # ================================================================================================ #
+
+    form = UserLoginForm()
+
+    return render(
+        request=request,
+        template_name="users/login.html",
+        context={"form": form},
+    )
+```
+
+There are other customizeable features regarding reCAPTCHA and the version of security you want. For more information just checkout the docs on the [django-recaptcha github page](https://github.com/torchbox/django-recaptcha) 
+---
+
+
+# TUTORIAL 12: User Profiles
+---
+
+This tutorial will show how to create user profiles. I will create the urlpattern based on the username and the view and form will be created inside the `users` app. 
+
+To get started I will go to the `users/url.py` file and add a new pattern:
+
+`users/url.py`
+```python
+...
+
+urlpatterns = [
+    path("register/", views.register, name="register"),
+    path('login/', views.custom_login, name="login"),
+    path('logout/', views.custom_logout, name="logout"),
+    # ========================================================= #
+    # THE NEW URL PATTERN FOR PROFILES
+    # ========================================================= #
+    path('profile/<username>/', views.profile, name="profile"),
+]
+```
+
+- Next thing I will need to do is go to the `users/forms.py` file and begin creating the new profile form to allow users to create new profiles and update them. I will create a form called `UserUpdateForm` since it will basically be updating the custom user signup form. 
+
+I will basically just be using the `CustomUser` model that I have already created to get the name, surname, email, description, etc..
+
+`users/forms.py`
+```python
+...
+
+class UserUpdateForm(forms.ModelForm):
+    
+    email = forms.EmailField()
+
+    class Meta:
+        model = get_user_model()
+        fields = ['first_name', 'last_name', 'email', 'description']
+
+```
+
+> This is a basic ass user profile form and model. I am going to create a new one once I get through these tutorials and have the examplaes I need to make the changes I want. 
+
+This is the new html file:
+
+`users/templates/users/profile.html`
+```html
+{% extends "main/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="content-section col-lg-12 col-md-12 col-sm-12 tutorial-style" style="min-height:65vh;">
+    <legend class="border-bottom mb-4">Profile Information:</legend>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="media">
+            <div class="media-body">
+                <h2 class="account-heading">{{ form.instance.username }}
+                    <small class="text-muted">({{ form.instance.status }})</small>
+                </h2>
+                <p class="text-secondary">{{ form.instance.first_name }} {{ form.instance.last_name }}</p>
+                <p class="text-secondary">{{ form.instance.email }}</p>
+                <p class="text-secondary">{{ form.instance.description }}</p>
+            </div>
+        </div>
+
+        {% if user.username == form.instance.username %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Edit Profile Information</legend>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.first_name|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.last_name|as_crispy_field }}
+                    </div>
+                </div> 
+                {{ form.email|as_crispy_field }}
+                {{ form.description|as_crispy_field }}
+
+                <a href="/">Change password?</a>
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Update</button>
+            </div>
+        {% endif %}
+    </form>
+</div>
+{% endblock content %}
+```
+
+
+---
+
+
+# TUTORIAL 13: Uploading and Managing Images
+---
+
+
+In this tutorial I will learn how to manage images that are added to the site and then display them.
+
+- To start I will have to add a new setting in the `settings.py` file:
+
+`settings.py`
+```python
+# CREATING THE MEDIA URL MANAGER
+MEDIA_URL = os.path.join(BASE_DIR, 'media/')
+```
+
+Once this has been done I will then need to create a new directory to hold the media files. Obviously the name of that directory will be called `media` and it will be in the projects root directory.
+
+- Next I will create a `default` directory inside the `media` directory. This is where the "default" photos will be loaded from. So the structure of the media directory will be `media/default/default_image.jpeg` where the default images are images that are loaded by default if one isn't added by the user. 
+
+- Now that I have the media directory and the settings changed, I can now update the models. I will have to add an image field to the models in order to add it to the admin file and be able to edit the article and series objects in the admin dashboard. 
+
+##### The `models.py` updated version:
+
+`main/models.py`
+```python
+from django.db import models
+from django.utils import timezone
+# in order to use the tinymce app in my website models, I have to import it into models
+# and then change the textfields that I want to use this app to HTMLField
+from tinymce.models import HTMLField
+from django.contrib.auth import get_user_model
+
+from django.template.defaultfilters import slugify
+import os
+
+
+class ArticleSeries(models.Model):
+    ###############################################################################################################
+    # UPDATED VERSION OF IMAGE
+    # ----------------------------------------------------------------------------------------------------------- #
+    def image_upload_to(self, instance=None):
+        if instance:
+            return os.path.join("ArticleSeries", slugify(self.slug), instance)
+        return None
+    # ----------------------------------------------------------------------------------------------------------- #
+
+    title = models.CharField(max_length=150)
+    subtitle = models.CharField(max_length=255, default="", blank=True)
+    slug = models.SlugField('Series slug', null=False, blank=False, unique=True)
+    publish_date = models.DateTimeField("Date Published", default=timezone.now)
+    ###############################################################################################################
+    # UPDATES
+    # ----------------------------------------------------------------------------------------------------------- #
+    author = models.ForeignKey(get_user_model(), default=1, on_delete=models.SET_DEFAULT)
+    image = models.ImageField(default='default/no_image_available.png', max_length=255, upload_to=image_upload_to)
+    # ----------------------------------------------------------------------------------------------------------- #
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name_plural = 'Series'
+        ordering = ['-publish_date']
+
+class Article(models.Model):
+    ###############################################################################################################
+    # UPDATED upload_to FOR ARTICLE
+    # ----------------------------------------------------------------------------------------------------------- #
+    def image_upload_to(self, instance=None):
+        if instance:
+            return os.path.join("ArticleSeries", slugify(self.series.slug), slugify(self.article_slug), instance)
+        return None
+    # ----------------------------------------------------------------------------------------------------------- #
+
+    title = models.CharField(max_length=150)
+    subtitle = models.CharField(max_length=255, default="", blank=True)
+    article_slug = models.SlugField('Article slug', null=False, blank=False, unique=True)
+    content = HTMLField(blank=True, default="")
+    # create a new field for notes then add it to the admin.py files fieldset
+    notes = HTMLField(blank=True, default="")
+    publish_date = models.DateTimeField("Date Published", default=timezone.now)
+    modified = models.DateTimeField("Date Modified", default=timezone.now)
+    series = models.ForeignKey(ArticleSeries, default='', verbose_name='Series', on_delete=models.SET_DEFAULT)
+    ###############################################################################################################
+    # UPDATES
+    # ----------------------------------------------------------------------------------------------------------- #
+    author = models.ForeignKey(get_user_model(), default=1, on_delete=models.SET_DEFAULT)
+    image = models.ImageField(default='default/no_image_available.png', max_length=255, upload_to=image_upload_to)
+    # ----------------------------------------------------------------------------------------------------------- #
+
+    # Create a __str__ method
+    def __str__(self):
+        return self.title
+
+    # I need to create a method that creates a slug field and use property decorator
+    @property
+    def slug(self):
+        return self.series.slug + '/' + self.article_slug
+
+    class Meta:
+        verbose_name_plural = "Article"
+        ordering = ['-publish_date']
+
+```
+
+- Now that these changes have been made, I will have to update the `main/templates/main/home.html` file. I will need to change the image src url and then to adjust the image size, I will need to use the css code inside the class of a `<div>` tag. I will put a div around the `<img>` tag and give it a class name of `<div class="aspect-ratio-box">`
+
+`main/templates/main/home.html`
+```html
+{% extends 'main/base.html' %}
+{% block content %}
+<div class="row display-flex justify-content-center">
+    {% for object in objects %}
+    <div class="col-lg-4 col-md-6 col-sm-12 mobiledevice mt-3 mb-2">
+        <article class="media content-section customhover" style="height: 95%;">
+            <div class="media-body">
+                <a href="/{{object.slug}}">
+                ###############################################################################################################
+                # UPDATES
+                # ----------------------------------------------------------------------------------------------------------- #
+                    <div class="aspect-ratio-box">
+                        <img class="img-fluid" src="{{ object.image.url }}" alt="">
+                    </div>
+                # ----------------------------------------------------------------------------------------------------------- #
+                </a>
+                <div>
+                    <a class="article-title line-clamp-2 title-style" style="font-size:22px"
+                        href="/{{object.slug}}">
+                        {{ object.title }}
+                    </a>
+                    <a href="/{{object.slug}}" style="text-decoration: none;">
+                        <p class="article-content line-clamp-5 subtitle-style">{{ object.subtitle }}</p>
+                    </a>
+                </div>
+            </div>
+        </article>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
+
+```
+
+- Next I will update the css file in my main static directory:
+
+`main/static/main/main.css`
+```css
+
+```

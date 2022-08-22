@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,7 +42,6 @@ INSTALLED_APPS = [
 
     # MY CREATED APPS:
     'main',
-    'django_site',
     'users', # You should always create a custom user model for each project
 
     # INSTALLED DJANGO APPS:
@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'fontawesomefree',
     'crispy_forms',
     'crispy_bootstrap5',
+    'captcha', # additional settings at bottom of page
 
 ]
 
@@ -145,7 +146,7 @@ MEDIA_URL = 'media/'
 
 # CREATE THE REDIRECT URL
 LOGIN_REDIRECT_URL = '/'
-
+LOGIN_URL = 'login'
 # This must be added in order for the custom user model to work properly. Also,
 # if you have already ran migrations, you have to delete all the existing migrations
 # as well as the database. Thats why this should be done first before anything else
@@ -172,10 +173,22 @@ TINYMCE_DEFAULT_CONFIG = {
     "custom_undo_redo_levels": 10,
     # "language": "es_ES",  # To force a specific language instead of the Django current language.
 }
+
 TINYMCE_SPELLCHECKER = True
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
+# CREATING THE MEDDIA 
+MEDIA_URL = os.path.join(BASE_DIR, 'media/')
+
+# Adding the backend authentication setting that I created for the EmailBackend object
+AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend']
+
+# ADDING THE RECAPTCHA SETTINGS:
+RECAPTCHA_PUBLIC_KEY = '6Lc09nchAAAAAPzFjaRfenIGDOYgHr3X1uqgzBKX'
+RECAPTCHA_PRIVATE_KEY = '6Lc09nchAAAAAF9qc3Rx0sXOgrbni9eU4XEHNRFr'
+# I have to add this to the development version
+SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']
 # ============================================================================ #
